@@ -1,20 +1,22 @@
 #' @export
 get_info <- function(ip = "192.168.54.1", setting, timeout = 5) {
   out <- tryCatch(
-    RCurl::getURL(paste0("http://", ip, "/cam.cgi?mode=getinfo&type=", setting),
-                  timeout = timeout),
+    httr::GET(paste0("http://", ip, "/cam.cgi?mode=getinfo&type=", setting),
+              httr::timeout(timeout)),
     error = function(e) NA
   )
 
-  if (is.na(out)) {
-    stop("No camera could be found at this address.")
-  } else {
-    test <- grepl("<result>ok</result>", out)
-
+  if (inherits(out, "response")) {
+    test <- grepl("<result>ok</result>", suppressMessages(httr::content(out)))
     if (!test) {
-      stop("Unknown setting.")
+      message("Unknown setting.")
+      test
     } else {
-      xml2::as_list(xml2::read_xml(out))
+      out <- xml2::as_list(xml2::read_xml(out))
+      out # attr(out$camrply$settingvalue, setting)
     }
+  } else {
+    message("The setting value could not be retrieved. Connection timeout.")
+    FALSE
   }
 }

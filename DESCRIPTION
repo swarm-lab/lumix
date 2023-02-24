@@ -12,8 +12,12 @@ Depends:
   shinyTime,
   shinyjs,
   miniUI,
-  RCurl,
-  xml2
+  httr,
+  xml2,
+  stringr,
+  hms,
+  lubridate,
+  parallel
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
